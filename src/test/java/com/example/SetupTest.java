@@ -6,5 +6,6 @@ public class SetupTest {
 
     @Test
     public void testMe() {
+        throw new RuntimeException();
     }
 }
