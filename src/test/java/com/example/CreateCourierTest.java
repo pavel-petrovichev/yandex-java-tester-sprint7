@@ -1,8 +1,8 @@
 package com.example;
 
-import com.example.model.CreateCourierErrorVO;
 import com.example.model.CreateCourierRequestVO;
 import com.example.model.CreateCourierResponseVO;
+import com.example.model.ErrorResponseVO;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -58,27 +58,28 @@ public class CreateCourierTest extends ScooterBaseTest {
         assertThat(response)
                 .isEqualTo(CreateCourierResponseVO.of(true));
 
-        CreateCourierErrorVO secondAttempt = createCourier(
+        ErrorResponseVO secondAttempt = createCourier(
                 courier,
                 SC_CONFLICT,
-                CreateCourierErrorVO.class);
+                ErrorResponseVO.class);
         assertThat(secondAttempt)
-                .isEqualTo(CreateCourierErrorVO.of(
+                .isEqualTo(ErrorResponseVO.of(
                         SC_CONFLICT,
-                        "Этот логин уже используется. Попробуйте другой."));
+                        "Этот логин уже используется"));
     }
 
     @Test
     public void loginIsMandatory() {
         courier = givenCourier();
-        courier.setLogin(null);
 
-        CreateCourierErrorVO response = createCourier(
-                courier,
+        ErrorResponseVO response = createCourier(
+                courier.toBuilder()
+                        .login(null)
+                        .build(),
                 SC_BAD_REQUEST,
-                CreateCourierErrorVO.class);
+                ErrorResponseVO.class);
         assertThat(response)
-                .isEqualTo(CreateCourierErrorVO.of(
+                .isEqualTo(ErrorResponseVO.of(
                         SC_BAD_REQUEST,
                         "Недостаточно данных для создания учетной записи"));
     }
@@ -86,14 +87,15 @@ public class CreateCourierTest extends ScooterBaseTest {
     @Test
     public void passwordIsMandatory() {
         courier = givenCourier();
-        courier.setPassword(null);
 
-        CreateCourierErrorVO response = createCourier(
-                courier,
+        ErrorResponseVO response = createCourier(
+                courier.toBuilder()
+                        .password(null)
+                        .build(),
                 SC_BAD_REQUEST,
-                CreateCourierErrorVO.class);
+                ErrorResponseVO.class);
         assertThat(response)
-                .isEqualTo(CreateCourierErrorVO.of(
+                .isEqualTo(ErrorResponseVO.of(
                         SC_BAD_REQUEST,
                         "Недостаточно данных для создания учетной записи"));
     }
@@ -101,14 +103,15 @@ public class CreateCourierTest extends ScooterBaseTest {
     @Test
     public void firstNameIsMandatory() {
         courier = givenCourier();
-        courier.setFirstName(null);
 
-        CreateCourierErrorVO response = createCourier(
-                courier,
+        ErrorResponseVO response = createCourier(
+                courier.toBuilder()
+                        .firstName(null)
+                        .build(),
                 SC_BAD_REQUEST,
-                CreateCourierErrorVO.class);
+                ErrorResponseVO.class);
         assertThat(response)
-                .isEqualTo(CreateCourierErrorVO.of(
+                .isEqualTo(ErrorResponseVO.of(
                         SC_BAD_REQUEST,
                         "Недостаточно данных для создания учетной записи"));
     }

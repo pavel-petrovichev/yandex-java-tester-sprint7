@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class CreateCourierErrorVO {
+public class ErrorResponseVO {
     private Integer code;
     private String message;
 }

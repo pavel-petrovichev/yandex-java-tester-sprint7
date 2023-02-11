@@ -3,14 +3,21 @@ package com.example;
 import com.example.model.*;
 import com.github.javafaker.Faker;
 import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.ValidatableResponse;
+import org.apache.http.params.CoreConnectionPNames;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.apache.http.HttpStatus.SC_CREATED;
@@ -19,6 +26,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class ScooterBaseTest {
 
+//    @Rule
+//    public Timeout globalTimeout = Timeout.seconds(15);
+
+    RestAssuredConfig config = RestAssured.config()
+            .httpClient(HttpClientConfig.httpClientConfig()
+                    .setParam(CoreConnectionPNames.SO_TIMEOUT, 10_000));
+
+
     protected Faker ruFaker;
     protected Faker enFaker;
 
@@ -26,6 +41,7 @@ public abstract class ScooterBaseTest {
 
     @Before
     public void setup() {
+        System.out.println("setup()");
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/api/v1/courier";
         RestAssured.port = 443;
 
@@ -41,7 +57,7 @@ public abstract class ScooterBaseTest {
             System.out.println("no couriers were not created, no clean up required");
         }
         for (CreateCourierRequestVO courier : createdCouriers) {
-            Long id = retrieveCourierId(courier.getLogin(), courier.getPassword());
+            Long id = retrieveCourierId(courier);
             deleteCourier(id);
         }
     }
@@ -53,9 +69,10 @@ public abstract class ScooterBaseTest {
     protected <T> T createCourier(
             CreateCourierRequestVO createCourierRequestVO,
             int expectedStatusCode,
-            Class<T> clazz) {
+            Class<T> responseClass) {
         System.out.printf("creating courier: %s\n", createCourierRequestVO);
         ValidatableResponse response = given()
+                .config(config)
                 .body(createCourierRequestVO)
                 .contentType(JSON)
                 .log().method().log().uri().log().body()
@@ -68,28 +85,40 @@ public abstract class ScooterBaseTest {
         return response
                 .log().status().log().body()
                 .statusCode(expectedStatusCode)
-                .extract().body().as(clazz);
+                .extract().body().as(responseClass);
     }
 
-    protected Long retrieveCourierId(String login, String password) {
-        System.out.printf("logging in as '%s'\n", login);
-        LoginRequestVO loginRequestVO = LoginRequestVO.of(login, password);
-        LoginResponseVO loginResponseVO = given()
-                .body(loginRequestVO)
+    protected LoginResponseVO loginCourier(CreateCourierRequestVO courier) {
+        return loginCourier(courier, SC_OK, LoginResponseVO.class);
+    }
+
+    protected <T> T loginCourier(
+            CreateCourierRequestVO courier,
+            int expectedStatusCode,
+            Class<T> responseClass) {
+        System.out.printf("logging in as '%s'\n", courier.getLogin());
+        return given()
+                .config(config)
+                .body(LoginRequestVO.of(courier.getLogin(), courier.getPassword()))
                 .contentType(JSON)
                 .log().method().log().uri().log().body()
                 .when()
                 .post("/login")
                 .then()
                 .log().status().log().body()
-                .statusCode(SC_OK)
-                .extract().body().as(LoginResponseVO.class);
-        return loginResponseVO.getId();
+                .statusCode(expectedStatusCode)
+                .extract().body().as(responseClass);
+    }
+
+    protected Long retrieveCourierId(CreateCourierRequestVO courier) {
+        return loginCourier(courier)
+                .getId();
     }
 
     protected void deleteCourier(Long id) {
         System.out.printf("deleting courier: %s\n", id);
         DeleteCourierResponseVO response = given()
+                .config(config)
                 .log().method().log().uri().log().body()
                 .when()
                 .delete("/{id}", id)

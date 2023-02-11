@@ -1,9 +1,11 @@
 package com.example.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder(toBuilder = true)
 @AllArgsConstructor(staticName = "of")
 public class CreateCourierRequestVO {
     private String login;
