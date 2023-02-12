@@ -3,6 +3,7 @@ package com.example;
 import com.example.model.courier.CreateCourierRequestVO;
 import com.example.model.courier.ErrorResponseVO;
 import com.example.model.courier.LoginResponseVO;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +11,7 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Story("Login Courier")
 public class CourierLoginTest extends ScooterBaseTest {
 
     CreateCourierRequestVO courier;

@@ -3,12 +3,14 @@ package com.example;
 import com.example.model.courier.CreateCourierRequestVO;
 import com.example.model.courier.CreateCourierResponseVO;
 import com.example.model.courier.ErrorResponseVO;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Story("Create Courier")
 public class CourierCreateTest extends ScooterBaseTest {
 
     CreateCourierRequestVO courier;

@@ -1,5 +1,6 @@
 package com.example;
 
+import io.qameta.allure.Story;
 import io.restassured.RestAssured;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
@@ -7,6 +8,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
 
+@Story("Ping")
 public class PingTest {
 
     @Before

@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.model.order.CreateOrderRequestVO;
 import com.example.model.order.CreateOrderResponseVO;
+import io.qameta.allure.Story;
 import lombok.RequiredArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import static com.example.model.order.Color.BLACK;
 import static com.example.model.order.Color.GRAY;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Story("Create Order: Colors")
 @RunWith(Parameterized.class)
 @RequiredArgsConstructor
 public class OrderCreateTest extends ScooterBaseTest {

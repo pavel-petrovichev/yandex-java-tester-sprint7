@@ -2,10 +2,12 @@ package com.example;
 
 import com.example.model.order.GetOrdersListRequestVO;
 import com.example.model.order.GetOrdersListResponseVO;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Story("Orders List")
 public class OrdersListTest extends ScooterBaseTest {
 
     GetOrdersListRequestVO request;

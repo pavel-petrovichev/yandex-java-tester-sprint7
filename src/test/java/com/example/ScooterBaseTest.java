@@ -70,20 +70,20 @@ public abstract class ScooterBaseTest {
     }
 
     protected <T> T createCourier(
-            CreateCourierRequestVO createCourierRequestVO,
+            CreateCourierRequestVO request,
             int expectedStatusCode,
             Class<T> responseClass) {
-        System.out.printf("creating courier: %s\n", createCourierRequestVO);
+        System.out.printf("creating courier: %s\n", request);
         ValidatableResponse response = given()
                 .config(config)
-                .body(createCourierRequestVO)
+                .body(request)
                 .contentType(JSON)
                 .log().method().log().uri().log().body()
                 .when()
                 .post("/courier")
                 .then();
         if (response.extract().statusCode() == SC_CREATED) {
-            createdCouriers.add(createCourierRequestVO);
+            createdCouriers.add(request);
         }
         return response
                 .log().status().log().body()
@@ -160,13 +160,13 @@ public abstract class ScooterBaseTest {
     }
 
     protected <T> T createOrder(
-            CreateOrderRequestVO createOrderRequestVO,
+            CreateOrderRequestVO request,
             int expectedStatusCode,
             Class<T> responseClass) {
-        System.out.printf("creating order: %s\n", createOrderRequestVO);
+        System.out.printf("creating order: %s\n", request);
         ValidatableResponse response = given()
                 .config(config)
-                .body(createOrderRequestVO)
+                .body(request)
                 .contentType(JSON)
                 .log().method().log().uri().log().body()
                 .when()
@@ -176,23 +176,6 @@ public abstract class ScooterBaseTest {
                 .log().status().log().body()
                 .statusCode(expectedStatusCode)
                 .extract().body().as(responseClass);
-    }
-
-    protected void cancelOrder(Long track) {
-        System.out.printf("cancelling order: %s\n", track);
-        DeleteCourierResponseVO response = given()
-                .config(config)
-                .log().method().log().uri().log().body()
-                .when()
-                .body(CancelOrderRequestVO.of(track))
-                .put("/orders/cancel")
-                .then()
-                .log().status().log().body()
-                .statusCode(SC_OK)
-                .extract().body().as(DeleteCourierResponseVO.class);
-
-        assertThat(response)
-                .isEqualTo(DeleteCourierResponseVO.of(true));
     }
 
     protected CreateOrderRequestVO givenDefaultOrder() {
