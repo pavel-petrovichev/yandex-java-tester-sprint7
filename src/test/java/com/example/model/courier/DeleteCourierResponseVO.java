@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.model.courier;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class LoginResponseVO {
-    private Long id;
+public class DeleteCourierResponseVO {
+    private Boolean ok;
 }

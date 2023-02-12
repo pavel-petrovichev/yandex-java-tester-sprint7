@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.model.*;
+import com.example.model.courier.*;
 import com.github.javafaker.Faker;
 import io.restassured.RestAssured;
 import io.restassured.config.HttpClientConfig;
@@ -15,9 +15,7 @@ import org.junit.rules.Timeout;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.apache.http.HttpStatus.SC_CREATED;
@@ -26,24 +24,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class ScooterBaseTest {
 
-//    @Rule
-//    public Timeout globalTimeout = Timeout.seconds(15);
+    @Rule
+    public Timeout globalTimeout = Timeout.seconds(30);
 
-    RestAssuredConfig config = RestAssured.config()
-            .httpClient(HttpClientConfig.httpClientConfig()
-                    .setParam(CoreConnectionPNames.SO_TIMEOUT, 10_000));
-
+    private RestAssuredConfig config;
 
     protected Faker ruFaker;
     protected Faker enFaker;
 
-    protected Set<CreateCourierRequestVO> createdCouriers;
+    private Set<CreateCourierRequestVO> createdCouriers;
 
     @Before
     public void setup() {
         System.out.println("setup()");
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/api/v1/courier";
         RestAssured.port = 443;
+        config = RestAssured.config()
+                .httpClient(HttpClientConfig.httpClientConfig()
+                        .setParam(CoreConnectionPNames.SO_TIMEOUT, 10_000));
 
         ruFaker = new Faker(Locale.forLanguageTag("RU"));
         enFaker = new Faker(Locale.ENGLISH);

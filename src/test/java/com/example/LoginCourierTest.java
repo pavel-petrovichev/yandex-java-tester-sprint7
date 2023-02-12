@@ -1,9 +1,8 @@
 package com.example;
 
-import com.example.model.CreateCourierRequestVO;
-import com.example.model.ErrorResponseVO;
-import com.example.model.LoginResponseVO;
-import org.apache.http.HttpStatus;
+import com.example.model.courier.CreateCourierRequestVO;
+import com.example.model.courier.ErrorResponseVO;
+import com.example.model.courier.LoginResponseVO;
 import org.junit.Before;
 import org.junit.Test;
 

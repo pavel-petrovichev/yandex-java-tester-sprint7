@@ -1,8 +1,8 @@
 package com.example;
 
-import com.example.model.CreateCourierRequestVO;
-import com.example.model.CreateCourierResponseVO;
-import com.example.model.ErrorResponseVO;
+import com.example.model.courier.CreateCourierRequestVO;
+import com.example.model.courier.CreateCourierResponseVO;
+import com.example.model.courier.ErrorResponseVO;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
