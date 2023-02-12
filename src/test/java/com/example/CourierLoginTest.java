@@ -10,14 +10,14 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LoginCourierTest extends ScooterBaseTest {
+public class CourierLoginTest extends ScooterBaseTest {
 
     CreateCourierRequestVO courier;
 
     @Before
     public void createCourier() {
         System.out.println("createCourier()");
-        courier = givenCourier();
+        courier = givenDefaultCourier();
         createCourier(courier);
     }
 

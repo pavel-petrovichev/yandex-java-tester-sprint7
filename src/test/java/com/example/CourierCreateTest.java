@@ -9,13 +9,13 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CreateCourierTest extends ScooterBaseTest {
+public class CourierCreateTest extends ScooterBaseTest {
 
     CreateCourierRequestVO courier;
 
     @Test
     public void createCourier() {
-        courier = givenCourier();
+        courier = givenDefaultCourier();
 
         CreateCourierResponseVO response = createCourier(courier);
 
@@ -52,7 +52,7 @@ public class CreateCourierTest extends ScooterBaseTest {
 
     @Test
     public void impossibleToCreateSameCourierTwice() {
-        courier = givenCourier();
+        courier = givenDefaultCourier();
 
         CreateCourierResponseVO response = createCourier(courier);
         assertThat(response)
@@ -70,7 +70,7 @@ public class CreateCourierTest extends ScooterBaseTest {
 
     @Test
     public void loginIsMandatory() {
-        courier = givenCourier();
+        courier = givenDefaultCourier();
 
         ErrorResponseVO response = createCourier(
                 courier.toBuilder()
@@ -86,7 +86,7 @@ public class CreateCourierTest extends ScooterBaseTest {
 
     @Test
     public void passwordIsMandatory() {
-        courier = givenCourier();
+        courier = givenDefaultCourier();
 
         ErrorResponseVO response = createCourier(
                 courier.toBuilder()
@@ -102,7 +102,7 @@ public class CreateCourierTest extends ScooterBaseTest {
 
     @Test
     public void firstNameIsMandatory() {
-        courier = givenCourier();
+        courier = givenDefaultCourier();
 
         ErrorResponseVO response = createCourier(
                 courier.toBuilder()

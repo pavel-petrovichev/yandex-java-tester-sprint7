@@ -1,7 +1,9 @@
 package com.example;
 
 import com.example.model.courier.*;
+import com.example.model.order.*;
 import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
 import io.restassured.RestAssured;
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -12,9 +14,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -37,7 +42,7 @@ public abstract class ScooterBaseTest {
     @Before
     public void setup() {
         System.out.println("setup()");
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/api/v1/courier";
+        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/api/v1";
         RestAssured.port = 443;
         config = RestAssured.config()
                 .httpClient(HttpClientConfig.httpClientConfig()
@@ -75,7 +80,7 @@ public abstract class ScooterBaseTest {
                 .contentType(JSON)
                 .log().method().log().uri().log().body()
                 .when()
-                .post()
+                .post("/courier")
                 .then();
         if (response.extract().statusCode() == SC_CREATED) {
             createdCouriers.add(createCourierRequestVO);
@@ -101,7 +106,7 @@ public abstract class ScooterBaseTest {
                 .contentType(JSON)
                 .log().method().log().uri().log().body()
                 .when()
-                .post("/login")
+                .post("/courier/login")
                 .then()
                 .log().status().log().body()
                 .statusCode(expectedStatusCode)
@@ -119,7 +124,7 @@ public abstract class ScooterBaseTest {
                 .config(config)
                 .log().method().log().uri().log().body()
                 .when()
-                .delete("/{id}", id)
+                .delete("/courier/{id}", id)
                 .then()
                 .log().status().log().body()
                 .statusCode(SC_OK)
@@ -131,7 +136,7 @@ public abstract class ScooterBaseTest {
 
     // default courier has login in English and first name in Russian
     // since that's what I would do if I were a courier
-    protected CreateCourierRequestVO givenCourier() {
+    protected CreateCourierRequestVO givenDefaultCourier() {
         return CreateCourierRequestVO.of(
                 generateLogin(),
                 generatePassword(),
@@ -148,5 +153,75 @@ public abstract class ScooterBaseTest {
 
     private String generateFirstName() {
         return ruFaker.name().firstName();
+    }
+
+    protected CreateOrderResponseVO createOrder(CreateOrderRequestVO createOrderRequestVO) {
+        return createOrder(createOrderRequestVO, SC_CREATED, CreateOrderResponseVO.class);
+    }
+
+    protected <T> T createOrder(
+            CreateOrderRequestVO createOrderRequestVO,
+            int expectedStatusCode,
+            Class<T> responseClass) {
+        System.out.printf("creating order: %s\n", createOrderRequestVO);
+        ValidatableResponse response = given()
+                .config(config)
+                .body(createOrderRequestVO)
+                .contentType(JSON)
+                .log().method().log().uri().log().body()
+                .when()
+                .post("/orders")
+                .then();
+        return response
+                .log().status().log().body()
+                .statusCode(expectedStatusCode)
+                .extract().body().as(responseClass);
+    }
+
+    protected void cancelOrder(Long track) {
+        System.out.printf("cancelling order: %s\n", track);
+        DeleteCourierResponseVO response = given()
+                .config(config)
+                .log().method().log().uri().log().body()
+                .when()
+                .body(CancelOrderRequestVO.of(track))
+                .put("/orders/cancel")
+                .then()
+                .log().status().log().body()
+                .statusCode(SC_OK)
+                .extract().body().as(DeleteCourierResponseVO.class);
+
+        assertThat(response)
+                .isEqualTo(DeleteCourierResponseVO.of(true));
+    }
+
+    protected CreateOrderRequestVO givenDefaultOrder() {
+        Name name = ruFaker.name();
+        return CreateOrderRequestVO.builder()
+                .firstName(name.firstName())
+                .lastName(name.lastName())
+                .address(ruFaker.address().fullAddress())
+                .metroStation(MetroStations.station())
+                .phone(ruFaker.phoneNumber().phoneNumber())
+                .rentTime(ThreadLocalRandom.current().nextInt(1, 8))
+                .deliveryDate(LocalDateTime.now().plusDays(1).toLocalDate().toString())
+                .comment(ruFaker.howIMetYourMother().catchPhrase())
+                .color(List.of(Color.BLACK))
+                .build();
+    }
+
+    protected GetOrdersListResponseVO getOrdersList() {
+        System.out.printf("getting order list\n");
+        GetOrdersListResponseVO response = given()
+                .config(config)
+                .log().method().log().uri().log().body()
+                .when()
+                .get("/orders")
+                .then()
+                .log().status().log().body()
+                .statusCode(SC_OK)
+                .extract().body().as(GetOrdersListResponseVO.class);
+
+        return response;
     }
 }
